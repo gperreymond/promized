@@ -13,6 +13,8 @@ services:
       DB_DATABASE: keycloak
       DB_USER: admin
       DB_PASSWORD: infra
+      KEYCLOAK_HOSTNAME: keycloak.docker.localhost
+      KEYCLOAK_ALWAYS_HTTPS: "true"
     networks:
       - private_security
       - public

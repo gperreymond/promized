@@ -1,13 +1,13 @@
 # DevOps Tools
 
-### Helpers
+## Helpers
 
 ```sh
 # Use the following command to generate a hash for the password:
 $ docker run --rm httpd:2.4-alpine htpasswd -nbB infra 'infra' | cut -d ":" -f 2
 ```
 
-### Prepare https localhost
+## Prepare https localhost
 
 ```sh
 $ export MKCERT_VERSION=1.4.1
@@ -18,7 +18,7 @@ $ mkcert mkcert docker.localhost "*.docker.localhost"
 
 Then move the two files generated in __devcerts__
 
-### How to use traefik labels
+## How to use traefik labels
 
 ```sh
 - traefik.enable=true
@@ -36,7 +36,7 @@ Then move the two files generated in __devcerts__
 - traefik.http.routers.NOM-SERVICE-https.tls=true
 ```
 
-### Start / Stop the stack
+## Start / Stop the stack
 
 To start the infrastructure on localhost:
 
@@ -56,7 +56,7 @@ To initialize the infrastructure, after starting:
 $ ./initialize.sh
 ```
 
-#### Portainer
+### Portainer
 
 https://portainer.docker.localhost
 
@@ -64,7 +64,7 @@ Credentials:
 * username: admin
 * password: infra
 
-#### Keycloak
+### Keycloak
 
 https://keycloak.docker.localhost
 
@@ -72,17 +72,17 @@ Credentials:
 * username: admin
 * password: infra
 
-#### OpenLDAP
+### OpenLDAP
 
 Credentials:
 * username: admin
 * password: infra
 
-#### Weave Scope
+### Weave Scope
 
 https://weave-scope.docker.localhost/
 
-#### Nats
+### Nats
 
 https://nats.docker.localhost
 
@@ -90,7 +90,10 @@ Credentials:
 * username: admin
 * password: infra
 
-#### Rabbitmq
+> user01 / password1
+> user02 / password2
+
+### Rabbitmq
 
 https://rabbitmq.docker.localhost
 
@@ -98,13 +101,13 @@ Credentials:
 * username: admin
 * password: infra
 
-#### Postgres
+### Postgres
 
 Credentials:
 * username: admin
 * password: infra
 
-#### PGAdmin
+### PgAdmin
 
 https://pgadmin.docker.localhost
 
