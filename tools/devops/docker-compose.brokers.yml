@@ -1,0 +1,74 @@
+version: '3.7'
+
+services:
+
+  nats:
+    image: "nats:2.1.7-linux"
+    command: >
+      --http_port 8222
+      --user infra
+      --pass infra
+    networks:
+      - private_brokers
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.nats.loadbalancer.server.port=8222
+
+        - traefik.http.routers.nats-http.entrypoints=insecure
+        - traefik.http.routers.nats-http.rule=Host(`nats.docker.localhost`)
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.nats-http.middlewares=https-redirect@docker
+
+        - traefik.http.routers.nats-https.entrypoints=secure
+        - traefik.http.routers.nats-https.rule=Host(`nats.docker.localhost`)
+        - traefik.http.routers.nats-https.tls=true
+    ports:
+      - target: 4222
+        published: 4222
+        mode: host
+
+  rabbitmq:
+    image: "rabbitmq:3.8.5-management-alpine"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "infra"
+      RABBITMQ_DEFAULT_PASS: "infra"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    networks:
+      - private_brokers
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+
+        - traefik.http.routers.rabbitmq-http.entrypoints=insecure
+        - traefik.http.routers.rabbitmq-http.rule=Host(`rabbitmq.docker.localhost`)
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.rabbitmq-http.middlewares=https-redirect@docker
+
+        - traefik.http.routers.rabbitmq-https.entrypoints=secure
+        - traefik.http.routers.rabbitmq-https.rule=Host(`rabbitmq.docker.localhost`)
+        - traefik.http.routers.rabbitmq-https.tls=true
+    ports:
+      - target: 5672
+        published: 5672
+        mode: host
+
+networks:
+
+  private_brokers:
+    driver: overlay
+    name: private_brokers
+  public:
+    external: true

@@ -1,0 +1,6 @@
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: "/etc/certs/mkcert+2.pem"
+        keyFile: "/etc/certs/mkcert+2-key.pem"

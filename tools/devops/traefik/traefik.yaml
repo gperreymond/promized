@@ -1,0 +1,23 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+api:
+  dashboard: true
+  debug: true
+  insecure: true
+
+entryPoints:
+  insecure:
+    address: ":80"
+  secure:
+    address: ":443"
+
+providers:
+  file:
+    filename: "/etc/traefik/traefik.dynamic.yaml"
+  docker:
+    network: public
+    watch: true
+    swarmMode: true
+    endpoint: "unix:///var/run/docker.sock"
