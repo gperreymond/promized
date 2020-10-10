@@ -50,6 +50,12 @@ To stop the infrastructure on localhost:
 $ ./stop.sh
 ```
 
+To initialize the infrastructure, after starting:
+
+```sh
+$ ./initialize.sh
+```
+
 #### Portainer
 
 https://portainer.docker.localhost
@@ -58,12 +64,30 @@ Credentials:
 * username: admin
 * password: infra
 
+#### Keycloak
+
+https://keycloak.docker.localhost
+
+Credentials:
+* username: admin
+* password: infra
+
+#### OpenLDAP
+
+Credentials:
+* username: admin
+* password: infra
+
+#### Weave Scope
+
+https://weave-scope.docker.localhost/
+
 #### Nats
 
 https://nats.docker.localhost
 
 Credentials:
-* username: infra
+* username: admin
 * password: infra
 
 #### Rabbitmq
@@ -71,5 +95,19 @@ Credentials:
 https://rabbitmq.docker.localhost
 
 Credentials:
-* username: infra
+* username: admin
+* password: infra
+
+#### Postgres
+
+Credentials:
+* username: admin
+* password: infra
+
+#### PGAdmin
+
+https://pgadmin.docker.localhost
+
+Credentials:
+* username: admin@docker.localhost
 * password: infra

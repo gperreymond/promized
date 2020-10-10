@@ -1,0 +1,71 @@
+version: '3.7'
+
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:11.0.2
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: infra
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_SCHEMA: public
+      DB_DATABASE: keycloak
+      DB_USER: admin
+      DB_PASSWORD: infra
+    networks:
+      - private_security
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.keycloak.loadbalancer.server.port=8080
+
+        - traefik.http.routers.keycloak-http.entrypoints=insecure
+        - traefik.http.routers.keycloak-http.rule=Host(`keycloak.docker.localhost`)
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.keycloak-http.middlewares=https-redirect@docker
+
+        - traefik.http.routers.keycloak-https.entrypoints=secure
+        - traefik.http.routers.keycloak-https.rule=Host(`keycloak.docker.localhost`)
+        - traefik.http.routers.keycloak-https.tls=true
+    networks:
+      - private_brokers
+      - public
+
+  openldap:
+    image: bitnami/openldap:2
+    environment:
+      LDAP_ROOT: dc=docker,dc=localhost
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: infra
+      LDAP_USERS: user01,user02
+      LDAP_PASSWORDS: password1,password2
+      LDAP_USER_DC: users
+      LDAP_GROUP: readers
+    networks:
+      - private_security
+    deploy:
+      mode: replicated
+      replicas: 1
+    networks:
+      - private_brokers
+      - public
+    volumes:
+      - "openldap_data:/bitnami/openldap"
+
+networks:
+
+  private_brokers:
+    driver: overlay
+    name: private_security
+  public:
+    external: true
+
+volumes:
+
+  openldap_data:

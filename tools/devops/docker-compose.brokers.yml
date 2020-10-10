@@ -6,7 +6,7 @@ services:
     image: "nats:2.1.7-linux"
     command: >
       --http_port 8222
-      --user infra
+      --user admin
       --pass infra
     networks:
       - private_brokers
@@ -37,7 +37,7 @@ services:
     image: "rabbitmq:3.8.5-management-alpine"
     environment:
       RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
-      RABBITMQ_DEFAULT_USER: "infra"
+      RABBITMQ_DEFAULT_USER: "admin"
       RABBITMQ_DEFAULT_PASS: "infra"
       RABBITMQ_DEFAULT_VHOST: "/"
     networks:

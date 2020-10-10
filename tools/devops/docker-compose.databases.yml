@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+
+  postgres:
+    image: "postgres:11-alpine"
+    environment:
+      POSTGRES_USER: "admin"
+      POSTGRES_PASSWORD: "infra"
+    networks:
+      - private_databases
+      - public
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    deploy:
+      mode: replicated
+      replicas: 1
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@docker.localhost"
+      PGADMIN_DEFAULT_PASSWORD: "infra"
+    networks:
+      - private_databases
+      - public
+    volumes:
+       - pgadmin_data:/root/.pgadmin
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.pgadmin.loadbalancer.server.port=80
+
+        - traefik.http.routers.pgadmin-http.entrypoints=insecure
+        - traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.docker.localhost`)
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.pgadmin-http.middlewares=https-redirect@docker
+
+        - traefik.http.routers.pgadmin-https.entrypoints=secure
+        - traefik.http.routers.pgadmin-https.rule=Host(`pgadmin.docker.localhost`)
+        - traefik.http.routers.pgadmin-https.tls=true
+
+volumes:
+
+  postgres_data:
+  pgadmin_data:
+
+networks:
+
+  private_databases:
+    driver: overlay
+    name: private_databases
+  public:
+    external: true

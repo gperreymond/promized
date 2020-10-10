@@ -15,7 +15,7 @@ services:
           - node.role == manager
       labels:
         - works.weave.role=system
-        
+
         - traefik.enable=true
         - traefik.http.services.weave-scope.loadbalancer.server.port=4040
 
