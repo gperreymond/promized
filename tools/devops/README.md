@@ -78,6 +78,10 @@ Credentials:
 * username: admin
 * password: infra
 
+Accounts
+* user01 / password1
+* user02 / password2
+
 ### Weave Scope
 
 https://weave-scope.docker.localhost/
@@ -89,9 +93,6 @@ https://nats.docker.localhost
 Credentials:
 * username: admin
 * password: infra
-
-> user01 / password1
-> user02 / password2
 
 ### Rabbitmq
 
