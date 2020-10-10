@@ -1,0 +1,48 @@
+{
+  "name": "promized",
+  "version": "0.0.1",
+  "description": "Prometheus dataflow concept",
+  "repository": "git@github.com:gperreymond/promized.git",
+  "author": "Gilles Perreymond <gperreymond@gmail.com>",
+  "scripts": {
+    "start:dev": "moleculer-runner --repl --hot --config moleculer.config.js services",
+    "start": "moleculer-runner --config moleculer.config.js services",
+    "standard": "standard",
+    "test": "jest --coverage --verbose --detectOpenHandles --forceExit"
+  },
+  "dependencies": {
+    "@hapi/boom": "9.1.0",
+    "@hapi/hoek": "9.1.0",
+    "@hapi/joi": "17.1.1",
+    "glob": "7.1.6",
+    "glob-promise": "3.4.0",
+    "lodash": "4.17.20",
+    "moleculer": "0.14.11",
+    "moleculer-db": "0.8.10",
+    "moleculer-db-adapter-mongo": "0.4.10",
+    "moleculer-db-adapter-sequelize": "0.2.9",
+    "moleculer-repl": "0.6.4",
+    "nats": "1.4.12",
+    "nconf": "0.10.0",
+    "rabbit-queue": "5.0.1",
+    "uuid": "8.3.1"
+  },
+  "devDependencies": {
+    "jest": "26.5.2",
+    "standard": "14.3.4"
+  },
+  "standard": {
+    "ignore": [],
+    "globals": [
+      "describe",
+      "test",
+      "fit",
+      "expect",
+      "beforeAll",
+      "afterAll",
+      "beforeEach",
+      "afterEach",
+      "jest"
+    ]
+  }
+}
