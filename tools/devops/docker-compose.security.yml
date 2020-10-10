@@ -35,34 +35,58 @@ services:
         - traefik.http.routers.keycloak-https.entrypoints=secure
         - traefik.http.routers.keycloak-https.rule=Host(`keycloak.docker.localhost`)
         - traefik.http.routers.keycloak-https.tls=true
-    networks:
-      - private_brokers
-      - public
 
   openldap:
-    image: bitnami/openldap:2
+    image: osixia/openldap:1.4.0
     environment:
-      LDAP_ROOT: dc=docker,dc=localhost
-      LDAP_ADMIN_USERNAME: admin
+      LDAP_ORGANISATION: localhost
+      LDAP_DOMAIN: docker.localhost
       LDAP_ADMIN_PASSWORD: infra
-      LDAP_USERS: user01,user02
-      LDAP_PASSWORDS: password1,password2
-      LDAP_USER_DC: users
-      LDAP_GROUP: readers
+      LDAP_RFC2307BIS_SCHEMA: "true"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+      LDAP_TLS: "false"
     networks:
       - private_security
     deploy:
       mode: replicated
       replicas: 1
-    networks:
-      - private_brokers
-      - public
     volumes:
-      - "openldap_data:/bitnami/openldap"
+      - var_lib_ldap:/var/lib/ldap
+      - etc_ldap_slapd:/etc/ldap/slapd.d
+
+  ldap-user-manager:
+    image: wheelybird/ldap-user-manager:v1.2
+    environment:
+      NO_HTTPS: "TRUE"
+      LDAP_URI: ldap://openldap:389
+      LDAP_BASE_DN: dc=docker,dc=localhost
+      LDAP_ADMINS_GROUP: admins
+      LDAP_ADMIN_BIND_DN: cn=admin,dc=docker,dc=localhost
+      LDAP_ADMIN_BIND_PWD: infra
+    networks:
+      - private_security
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.ldap-manager.loadbalancer.server.port=80
+
+        - traefik.http.routers.ldap-manager-http.entrypoints=insecure
+        - traefik.http.routers.ldap-manager-http.rule=Host(`ldap-manager.docker.localhost`)
+
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        - traefik.http.routers.ldap-manager-http.middlewares=https-redirect@docker
+
+        - traefik.http.routers.ldap-manager-https.entrypoints=secure
+        - traefik.http.routers.ldap-manager-https.rule=Host(`ldap-manager.docker.localhost`)
+        - traefik.http.routers.ldap-manager-https.tls=true
 
 networks:
 
-  private_brokers:
+  private_security:
     driver: overlay
     name: private_security
   public:
@@ -70,4 +94,5 @@ networks:
 
 volumes:
 
-  openldap_data:
+  var_lib_ldap:
+  etc_ldap_slapd:

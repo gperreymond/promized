@@ -72,19 +72,27 @@ Credentials:
 * username: admin
 * password: infra
 
+![Keycloak setup](./keycloak_user_federation.png)
+
 ### OpenLDAP
 
 Credentials:
 * username: admin
 * password: infra
 
-Accounts
-* user01 / password1
-* user02 / password2
+### OpenLDAP WebUI
+
+https://ldap-manager.docker.localhost
+
+Firt setup go to: https://ldap-manager.docker.localhost/setup
+
+Credentials:
+* username: admin
+* password: infra
 
 ### Weave Scope
 
-https://weave-scope.docker.localhost/
+https://weave-scope.docker.localhost
 
 ### Nats
 
