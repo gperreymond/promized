@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
 
-  scope:
+  weave-scope:
     image: weaveworks/scope:1.13.1
     networks:
       - private_portainer
@@ -15,17 +15,17 @@ services:
           - node.role == manager
       labels:
         - works.weave.role=system
-
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.weave-scope.loadbalancer.server.port=4040
-
-        - traefik.http.routers.weave-scope-http.entrypoints=insecure
-        - traefik.http.routers.weave-scope-http.rule=Host(`weave-scope.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.weave-scope.loadbalancer.server.port=4040
+        # HTTP
+        - traefik.http.routers.weave-scope-http.entrypoints=insecure
+        - traefik.http.routers.weave-scope-http.rule=Host(`weave-scope.docker.localhost`)
         - traefik.http.routers.weave-scope-http.middlewares=https-redirect@docker
-
+        # HTTPS
         - traefik.http.routers.weave-scope-https.entrypoints=secure
         - traefik.http.routers.weave-scope-https.rule=Host(`weave-scope.docker.localhost`)
         - traefik.http.routers.weave-scope-https.tls=true
@@ -53,7 +53,7 @@ services:
 
   portainer:
     image: portainer/portainer:1.24.0-alpine
-    command: -H tcp://tasks.agent:9001 --tlsskipverify --admin-password '$$2y$$05$$v/MgPft4FUgD772S1VenouFjpChwYUCYvxUxAQHIaV/0kE/RWHBy2'
+    command: -H tcp://tasks.agent:9001 --tlsskipverify --no-auth '
     volumes:
       - portainer_data:/data
     networks:
@@ -66,16 +66,17 @@ services:
         constraints:
           - node.role == manager
       labels:
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.portainer.loadbalancer.server.port=9000
-
-        - traefik.http.routers.portainer-http.entrypoints=insecure
-        - traefik.http.routers.portainer-http.rule=Host(`portainer.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.portainer.loadbalancer.server.port=9000
+        # HTTP
+        - traefik.http.routers.portainer-http.entrypoints=insecure
+        - traefik.http.routers.portainer-http.rule=Host(`portainer.docker.localhost`)
         - traefik.http.routers.portainer-http.middlewares=https-redirect@docker
-
+        # HTTPS
         - traefik.http.routers.portainer-https.entrypoints=secure
         - traefik.http.routers.portainer-https.rule=Host(`portainer.docker.localhost`)
         - traefik.http.routers.portainer-https.tls=true

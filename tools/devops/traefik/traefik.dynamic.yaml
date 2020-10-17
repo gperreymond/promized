@@ -4,3 +4,12 @@ tls:
       defaultCertificate:
         certFile: "/etc/certs/mkcert+2.pem"
         keyFile: "/etc/certs/mkcert+2-key.pem"
+
+http:
+  middlewares:
+    keycloak:
+      forwardAuth:
+        address: "https://traefik-forward-auth.docker.localhost"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - "X-Forwarded-User"

@@ -13,27 +13,28 @@ $ docker run --rm httpd:2.4-alpine htpasswd -nbB infra 'infra' | cut -d ":" -f 2
 $ export MKCERT_VERSION=1.4.1
 $ sudo wget -O /usr/local/bin/mkcert https://github.com/FiloSottile/mkcert/releases/download/v$MKCERT_VERSION/mkcert-v$MKCERT_VERSION-linux-amd64
 $ sudo chmod +x /usr/local/bin/mkcert
-$ mkcert mkcert docker.localhost "*.docker.localhost"
+$ mkcert docker.localhost "*.docker.localhost"
 ```
 
 Then move the two files generated in __devcerts__
 
 ## How to use traefik labels
 
-```sh
+```yaml
+# GLOBAL
 - traefik.enable=true
-- traefik.http.services.NOM-SERVICE.loadbalancer.server.port=8080
-
-- traefik.http.routers.NOM-SERVICE-http.entrypoints=insecure
-- traefik.http.routers.NOM-SERVICE-http.rule=Host(`NOM-SERVICE.NDD`)
-
 - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
 - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
-- traefik.http.routers.NOM-SERVICE-http.middlewares=https-redirect@docker
-
-- traefik.http.routers.NOM-SERVICE-https.entrypoints=secure
-- traefik.http.routers.NOM-SERVICE-https.rule=Host(`NOM-SERVICE.NDD`)
-- traefik.http.routers.NOM-SERVICE-https.tls=true
+# PORT
+- traefik.http.services.<NAME>.loadbalancer.server.port=<PORT>
+# HTTP
+- traefik.http.routers.<NAME>-http.entrypoints=insecure
+- traefik.http.routers.<NAME>-http.rule=Host(`<HOSTNAME>.docker.localhost`)
+- traefik.http.routers.<NAME>-http.middlewares=https-redirect@docker
+# HTTPS
+- traefik.http.routers.<NAME>-https.entrypoints=secure
+- traefik.http.routers.<NAME>-https.rule=Host(`<HOSTNAME>.docker.localhost`)
+- traefik.http.routers.<NAME>-https.tls=true
 ```
 
 ## Start / Stop the stack

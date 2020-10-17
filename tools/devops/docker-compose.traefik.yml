@@ -25,17 +25,17 @@ services:
         constraints:
           - node.role == manager
       labels:
-        # Global
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.traefik.loadbalancer.server.port=8080
-        # Http
-        - traefik.http.routers.traefik-http.entrypoints=insecure
-        - traefik.http.routers.traefik-http.rule=Host(`traefik.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.traefik.loadbalancer.server.port=8080
+        # HTTP
+        - traefik.http.routers.traefik-http.entrypoints=insecure
+        - traefik.http.routers.traefik-http.rule=Host(`traefik.docker.localhost`)
         - traefik.http.routers.traefik-http.middlewares=https-redirect@docker
-
+        # HTTPS
         - traefik.http.routers.traefik-https.entrypoints=secure
         - traefik.http.routers.traefik-https.rule=Host(`traefik.docker.localhost`)
         - traefik.http.routers.traefik-https.tls=true

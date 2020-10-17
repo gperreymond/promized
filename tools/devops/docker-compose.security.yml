@@ -2,6 +2,38 @@ version: '3.7'
 
 services:
 
+  traefik-forward-auth:
+    image: funkypenguin/traefik-forward-auth
+    environment:
+      - CLIENT_ID=traefik-auth
+      - CLIENT_SECRET="<random_secret>"
+      - OIDC_ISSUER=https://auth.docker.localhost/auth/realms/master
+      - SECRET=LH49wCZ4ZijgUTfm8etb
+      - AUTH_HOST=auth.docker.localhost
+      - COOKIE_DOMAINS=docker.localhost
+      - LOG_LEVEL=debug
+    networks:
+      - private_security
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        # GLOBAL
+        - traefik.enable=true
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181
+        # HTTP
+        - traefik.http.routers.traefik-forward-auth-http.entrypoints=insecure
+        - traefik.http.routers.traefik-forward-auth-http.rule=Host(`traefik-forward-auth.docker.localhost`)
+        - traefik.http.routers.traefik-forward-auth-http.middlewares=https-redirect@docker
+        # HTTPS
+        - traefik.http.routers.traefik-forward-auth-https.entrypoints=secure
+        - traefik.http.routers.traefik-forward-auth-https.rule=Host(`traefik-forward-auth.docker.localhost`)
+        - traefik.http.routers.traefik-forward-auth-https.tls=true
+
   keycloak:
     image: quay.io/keycloak/keycloak:11.0.2
     environment:
@@ -13,7 +45,7 @@ services:
       DB_DATABASE: keycloak
       DB_USER: admin
       DB_PASSWORD: infra
-      KEYCLOAK_HOSTNAME: keycloak.docker.localhost
+      KEYCLOAK_HOSTNAME: auth.docker.localhost
       KEYCLOAK_ALWAYS_HTTPS: "true"
     networks:
       - private_security
@@ -22,16 +54,17 @@ services:
       mode: replicated
       replicas: 1
       labels:
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.keycloak.loadbalancer.server.port=8080
-
-        - traefik.http.routers.keycloak-http.entrypoints=insecure
-        - traefik.http.routers.keycloak-http.rule=Host(`keycloak.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.keycloak.loadbalancer.server.port=8080
+        # HTTP
+        - traefik.http.routers.keycloak-http.entrypoints=insecure
+        - traefik.http.routers.keycloak-http.rule=Host(`keycloak.docker.localhost`)
         - traefik.http.routers.keycloak-http.middlewares=https-redirect@docker
-
+        # HTTPS
         - traefik.http.routers.keycloak-https.entrypoints=secure
         - traefik.http.routers.keycloak-https.rule=Host(`keycloak.docker.localhost`)
         - traefik.http.routers.keycloak-https.tls=true
@@ -70,19 +103,20 @@ services:
       mode: replicated
       replicas: 1
       labels:
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.ldap-manager.loadbalancer.server.port=80
-
-        - traefik.http.routers.ldap-manager-http.entrypoints=insecure
-        - traefik.http.routers.ldap-manager-http.rule=Host(`ldap-manager.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
-        - traefik.http.routers.ldap-manager-http.middlewares=https-redirect@docker
-
-        - traefik.http.routers.ldap-manager-https.entrypoints=secure
-        - traefik.http.routers.ldap-manager-https.rule=Host(`ldap-manager.docker.localhost`)
-        - traefik.http.routers.ldap-manager-https.tls=true
+        # PORT
+        - traefik.http.services.ldap-user-manager.loadbalancer.server.port=80
+        # HTTP
+        - traefik.http.routers.ldap-user-manager-http.entrypoints=insecure
+        - traefik.http.routers.ldap-user-manager-http.rule=Host(`ldap-user-manager.docker.localhost`)
+        - traefik.http.routers.ldap-user-manager-http.middlewares=https-redirect@docker
+        # HTTPS
+        - traefik.http.routers.ldap-user-manager-https.entrypoints=secure
+        - traefik.http.routers.ldap-user-manager-https.rule=Host(`ldap-user-manager.docker.localhost`)
+        - traefik.http.routers.ldap-user-manager-https.tls=true
 
 networks:
 

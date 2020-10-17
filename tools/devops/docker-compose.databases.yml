@@ -37,16 +37,17 @@ services:
       mode: replicated
       replicas: 1
       labels:
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.pgadmin.loadbalancer.server.port=80
-
-        - traefik.http.routers.pgadmin-http.entrypoints=insecure
-        - traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.pgadmin.loadbalancer.server.port=80
+        # HTTP
+        - traefik.http.routers.pgadmin-http.entrypoints=insecure
+        - traefik.http.routers.pgadmin-http.rule=Host(`pgadmin.docker.localhost`)
         - traefik.http.routers.pgadmin-http.middlewares=https-redirect@docker
-
+        # HTTPS
         - traefik.http.routers.pgadmin-https.entrypoints=secure
         - traefik.http.routers.pgadmin-https.rule=Host(`pgadmin.docker.localhost`)
         - traefik.http.routers.pgadmin-https.tls=true

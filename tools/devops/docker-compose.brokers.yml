@@ -3,11 +3,11 @@ version: '3.7'
 services:
 
   nats:
-    image: "nats:2.1.7-linux"
+    image: "bitnami/nats:2-debian-10"
     command: >
       --http_port 8222
-      --user admin
-      --pass infra
+      --user "${NATS_USERNAME}"
+      --pass "${NATS_PASSWORD}"
     networks:
       - private_brokers
       - public
@@ -15,16 +15,17 @@ services:
       mode: replicated
       replicas: 1
       labels:
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.nats.loadbalancer.server.port=8222
-
-        - traefik.http.routers.nats-http.entrypoints=insecure
-        - traefik.http.routers.nats-http.rule=Host(`nats.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.nats.loadbalancer.server.port=8222
+        # HTTP
+        - traefik.http.routers.nats-http.entrypoints=insecure
+        - traefik.http.routers.nats-http.rule=Host(`nats.docker.localhost`)
         - traefik.http.routers.nats-http.middlewares=https-redirect@docker
-
+        # HTTPS
         - traefik.http.routers.nats-https.entrypoints=secure
         - traefik.http.routers.nats-https.rule=Host(`nats.docker.localhost`)
         - traefik.http.routers.nats-https.tls=true
@@ -33,13 +34,10 @@ services:
         published: 4222
         mode: host
 
-  rabbitmq:
-    image: "rabbitmq:3.8.5-management-alpine"
-    environment:
-      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
-      RABBITMQ_DEFAULT_USER: "admin"
-      RABBITMQ_DEFAULT_PASS: "infra"
-      RABBITMQ_DEFAULT_VHOST: "/"
+  nats-exporter:
+    image: bitnami/nats-exporter:0-debian-10
+    command: >
+      -varz https://nats.docker.localhost
     networks:
       - private_brokers
       - public
@@ -47,16 +45,47 @@ services:
       mode: replicated
       replicas: 1
       labels:
+        # GLOBAL
         - traefik.enable=true
-        - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
-
-        - traefik.http.routers.rabbitmq-http.entrypoints=insecure
-        - traefik.http.routers.rabbitmq-http.rule=Host(`rabbitmq.docker.localhost`)
-
         - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
         - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
-        - traefik.http.routers.rabbitmq-http.middlewares=https-redirect@docker
+        # PORT
+        - traefik.http.services.nats-exporter.loadbalancer.server.port=7777
+        # HTTP
+        - traefik.http.routers.nats-exporter-http.entrypoints=insecure
+        - traefik.http.routers.nats-exporter-http.rule=Host(`nats-exporter.docker.localhost`)
+        - traefik.http.routers.nats-exporter-http.middlewares=https-redirect@docker
+        # HTTPS
+        - traefik.http.routers.nats-exporter-https.entrypoints=secure
+        - traefik.http.routers.nats-exporter-https.rule=Host(`nats-exporter.docker.localhost`)
+        - traefik.http.routers.nats-exporter-https.tls=true
 
+  rabbitmq:
+    image: "bitnami/rabbitmq:3.8-debian-10"
+    environment:
+      RABBITMQ_ERL_COOKIE: "${RABBITMQ_ERL_COOKIE}"
+      RABBITMQ_USERNAME: "${RABBITMQ_USERNAME}"
+      RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD}"
+    volumes:
+      - rabbitmq_data:/bitnami
+    networks:
+      - private_brokers
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        # GLOBAL
+        - traefik.enable=true
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
+        # HTTP
+        - traefik.http.routers.rabbitmq-http.entrypoints=insecure
+        - traefik.http.routers.rabbitmq-http.rule=Host(`rabbitmq.docker.localhost`)
+        - traefik.http.routers.rabbitmq-http.middlewares=https-redirect@docker
+        # HTTPS
         - traefik.http.routers.rabbitmq-https.entrypoints=secure
         - traefik.http.routers.rabbitmq-https.rule=Host(`rabbitmq.docker.localhost`)
         - traefik.http.routers.rabbitmq-https.tls=true
@@ -64,6 +93,38 @@ services:
       - target: 5672
         published: 5672
         mode: host
+
+  rabbitmq-exporter:
+    image: bitnami/rabbitmq-exporter:0-debian-10
+    environment:
+      RABBIT_URL: https://rabbitmq.docker.localhost
+      RABBIT_USER: "${RABBITMQ_USERNAME}"
+      RABBIT_PASSWORD: "${RABBITMQ_PASSWORD}"
+    networks:
+      - private_brokers
+      - public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        # GLOBAL
+        - traefik.enable=true
+        - traefik.http.middlewares.https-redirect.redirectscheme.scheme=https
+        - traefik.http.middlewares.https-redirect.redirectscheme.permanent=true
+        # PORT
+        - traefik.http.services.rabbitmq-exporter.loadbalancer.server.port=9090
+        # HTTP
+        - traefik.http.routers.rabbitmq-exporter-http.entrypoints=insecure
+        - traefik.http.routers.rabbitmq-exporter-http.rule=Host(`rabbitmq-exporter.docker.localhost`)
+        - traefik.http.routers.rabbitmq-exporter-http.middlewares=https-redirect@docker
+        # HTTPS
+        - traefik.http.routers.rabbitmq-exporter-https.entrypoints=secure
+        - traefik.http.routers.rabbitmq-exporter-https.rule=Host(`rabbitmq-exporter.docker.localhost`)
+        - traefik.http.routers.rabbitmq-exporter-https.tls=true
+
+volumes:
+
+  rabbitmq_data:
 
 networks:
 
