@@ -12,11 +12,11 @@ if (nconf.get('APP_RABBITMQ_PORT')) { APP_RABBITMQ_PORT = parseInt(nconf.get('AP
 // ************************************
 
 const APP_NATS_HOSTNAME = nconf.get('APP_NATS_HOSTNAME') || 'nats.docker.localhost'
-const APP_NATS_USERNAME = nconf.get('APP_NATS_USERNAME') || 'infra'
+const APP_NATS_USERNAME = nconf.get('APP_NATS_USERNAME') || 'admin@docker.localhost'
 const APP_NATS_PASSWORD = nconf.get('APP_NATS_PASSWORD') || 'infra'
 
 const APP_RABBITMQ_HOSTNAME = nconf.get('APP_RABBITMQ_HOSTNAME') || 'rabbitmq.docker.localhost'
-const APP_RABBITMQ_USERNAME = nconf.get('APP_RABBITMQ_USERNAME') || 'infra'
+const APP_RABBITMQ_USERNAME = nconf.get('APP_RABBITMQ_USERNAME') || 'admin@docker.localhost'
 const APP_RABBITMQ_PASSWORD = nconf.get('APP_RABBITMQ_PASSWORD') || 'infra'
 
 module.exports = {

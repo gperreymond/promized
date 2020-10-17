@@ -15,6 +15,6 @@ module.exports = {
   },
   logger: true,
   metrics: {
-    enabled: false
+    enabled: true
   }
 }
