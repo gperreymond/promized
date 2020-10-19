@@ -20,10 +20,12 @@
     "moleculer": "0.14.11",
     "moleculer-db": "0.8.10",
     "moleculer-db-adapter-mongo": "0.4.10",
+    "moleculer-db-adapter-rethinkdb": "0.2.9",
     "moleculer-db-adapter-sequelize": "0.2.10",
     "moleculer-repl": "0.6.4",
     "nats": "1.4.12",
     "nconf": "0.10.0",
+    "parse-prometheus-text-format": "1.1.1",
     "rabbit-queue": "5.0.1",
     "uuid": "8.3.1"
   },

@@ -37,7 +37,7 @@ services:
   nats-exporter:
     image: bitnami/nats-exporter:0-debian-10
     command: >
-      -varz https://nats.docker.localhost
+      -varz http://nats:8222
     networks:
       - private_brokers
       - public
@@ -97,7 +97,7 @@ services:
   rabbitmq-exporter:
     image: bitnami/rabbitmq-exporter:0-debian-10
     environment:
-      RABBIT_URL: https://rabbitmq.docker.localhost
+      RABBIT_URL: http://rabbitmq:15672
       RABBIT_USER: "${RABBITMQ_USERNAME}"
       RABBIT_PASSWORD: "${RABBITMQ_PASSWORD}"
     networks:
