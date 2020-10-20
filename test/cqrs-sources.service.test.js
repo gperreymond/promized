@@ -15,7 +15,7 @@ afterAll(async () => {
   await broker.stop()
 })
 
-describe('SourcesDomain.xx', () => {
+describe('CQRSSourcesDomain.xx', () => {
   test('should ...', async () => {
     expect(true).toEqual(true)
   })

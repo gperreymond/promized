@@ -4,7 +4,7 @@ const RethinkDBAdapter = require('moleculer-db-adapter-rethinkdb')
 const { rethinkdb } = require('../application.config')
 
 module.exports = {
-  name: 'config',
+  name: 'CRUDJobs',
   mixins: [DbService],
   adapter: new RethinkDBAdapter({
     host: rethinkdb.hostname,
@@ -13,7 +13,7 @@ module.exports = {
     password: rethinkdb.password
   }),
   database: 'promized',
-  table: 'config',
+  table: 'jobs',
   hooks: {
     before: {
       create: [
@@ -49,6 +49,7 @@ module.exports = {
       name: { type: 'string' },
       url: { type: 'string' },
       type: { type: 'string', enum: ['CONFIG_TYPE_SCRAPER'] },
+      crontab: { type: 'string' },
       createdAt: { type: 'date' },
       updatedAt: { type: 'date' },
       $$strict: true // no additional properties allowed

@@ -1,7 +1,7 @@
 const CQRSMixin = require('../cqrs/cqrs.mixin')
 
 module.exports = {
-  name: 'SourcesDomain',
+  name: 'CQRSSourcesDomain',
   mixins: [CQRSMixin],
   actions: {
   },
